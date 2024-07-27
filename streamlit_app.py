@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import openpyxl
 
 # Function to load Excel file
 def load_data(file):
@@ -25,7 +24,7 @@ if uploaded_file:
     
     # Extracting required columns
     required_columns = ["Name", "Handle", "Faction", "Tags"]
-    permissions_columns = [col for col in df.columns if col not in required_columns]
+    permissions_columns = [col for col in df.columns if col not in required_columns and col != "Permissions"]
     
     # Add a dropdown to filter by Faction
     faction_filter = st.selectbox("Select Faction", options=df["Faction"].unique())
@@ -36,7 +35,7 @@ if uploaded_file:
     # Displaying the table with checkmarks for permissions
     df_permissions = df_filtered[required_columns + permissions_columns]
     for perm in permissions_columns:
-        df_permissions[perm] = df_permissions[perm].apply(lambda x: "✅" if x == 'yes' else "")
+        df_permissions[perm] = df_permissions[perm].apply(lambda x: "✅" if x == 'x' else "")
     
     st.dataframe(df_permissions)
     
@@ -54,8 +53,8 @@ if uploaded_file:
         if perm not in df_filtered.columns:
             df_filtered[perm] = ''
         for i, row in df_filtered.iterrows():
-            checked = st.checkbox(f"{row['Name']} ({row['Handle']})", value=(row[perm] == 'yes'), key=f"{perm}_{i}")
-            df.at[row.name, perm] = 'yes' if checked else ''
+            checked = st.checkbox(f"{row['Name']} ({row['Handle']})", value=(row[perm] == 'x'), key=f"{perm}_{i}")
+            df.at[row.name, perm] = 'x' if checked else ''
     
     # Save updated DataFrame back to Excel
     if st.button("Save Updates"):
