@@ -83,6 +83,23 @@ elif mode == "Convert Columns to Permissions":
             st.write("Converted Data")
             st.write(converted_df)
             
+            # Allow filtering by multiple permissions
+            unique_permissions = set(
+                perm.strip()
+                for sublist in converted_df['Permissions'].str.split(',').dropna().tolist()
+                for perm in sublist
+            )
+            selected_permissions = st.multiselect('Filter by Permissions', list(unique_permissions))
+            
+            if selected_permissions:
+                filtered_df = converted_df[converted_df['Permissions'].apply(
+                    lambda x: any(perm in x for perm in selected_permissions)
+                )]
+                st.write("Filtered Data")
+                st.write(filtered_df)
+            else:
+                filtered_df = converted_df
+            
             @st.cache
             def convert_df_to_excel(df):
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
@@ -90,11 +107,11 @@ elif mode == "Convert Columns to Permissions":
                         df.to_excel(writer, index=False)
                     return tmp.name
             
-            excel_data = convert_df_to_excel(converted_df)
+            excel_data = convert_df_to_excel(filtered_df)
             with open(excel_data, 'rb') as f:
                 st.download_button(
-                    label="Download Converted Data as Excel",
+                    label="Download Filtered Data as Excel",
                     data=f.read(),
-                    file_name='converted_permissions.xlsx',
+                    file_name='filtered_permissions.xlsx',
                     mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                 )
