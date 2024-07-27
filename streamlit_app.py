@@ -1,41 +1,45 @@
 import streamlit as st
 import pandas as pd
 
-# Function to process the file and update permissions
-def update_permissions(df):
-    # Identify the columns with 'x' marks
-    permission_columns = df.columns[5:]  # Assuming permissions start from the 6th column
-    for col in permission_columns:
-        df[col] = df[col].apply(lambda x: col if x == 'x' else None)
-    
-    # Combine the permissions into the Permissions column
-    df['Permissions'] = df[permission_columns].apply(lambda row: ', '.join(filter(None, row)), axis=1)
-    return df
+def convert_to_columns(df):
+    # Split the 'Permission' column into multiple columns
+    permissions = df['Permission'].str.split(',', expand=True).stack().str.strip().unique()
+    for perm in permissions:
+        df[perm] = df['Permission'].apply(lambda x: 'x' if perm in x else '')
+    return df.drop(columns=['Permission'])
 
-# Streamlit app
-st.title("Permission Updater")
+# Streamlit App
+st.title("Permission Converter")
 
-uploaded_file = st.file_uploader("Upload your Excel file", type="xlsx")
+mode = st.selectbox("Select Mode", ["Convert to Columns", "Convert Columns to Permissions"])
 
-if uploaded_file:
-    df = pd.read_excel(uploaded_file)
-    st.write("Original Data:")
-    st.write(df)
+if mode == "Convert to Columns":
+    st.header("Convert to Columns Mode")
     
-    st.write("Processed Data:")
-    processed_df = update_permissions(df)
-    st.write(processed_df)
+    uploaded_file = st.file_uploader("Upload an Excel file", type=["xlsx"])
     
-    # Allow downloading the processed file
-    @st.cache
-    def convert_df(df):
-        return df.to_excel(index=False)
-
-    processed_file = convert_df(processed_df)
-    
-    st.download_button(
-        label="Download Processed Data",
-        data=processed_file,
-        file_name="processed_permissions.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+    if uploaded_file is not None:
+        df = pd.read_excel(uploaded_file)
+        
+        if 'Permission' not in df.columns:
+            st.error("The uploaded file does not contain a 'Permission' column.")
+        else:
+            st.write("Original Data")
+            st.dataframe(df)
+            
+            converted_df = convert_to_columns(df)
+            
+            st.write("Converted Data")
+            st.dataframe(converted_df)
+            
+            @st.cache
+            def convert_df_to_excel(df):
+                return df.to_excel(index=False, engine='xlsxwriter')
+            
+            excel_data = convert_df_to_excel(converted_df)
+            st.download_button(
+                label="Download Converted Data as Excel",
+                data=excel_data,
+                file_name='converted_permissions.xlsx',
+                mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
