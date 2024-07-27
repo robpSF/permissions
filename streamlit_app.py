@@ -107,11 +107,19 @@ elif mode == "Convert Columns to Permissions":
                         df.to_excel(writer, index=False)
                     return tmp.name
             
-            excel_data = convert_df_to_excel(filtered_df)
-            with open(excel_data, 'rb') as f:
-                st.download_button(
-                    label="Download Filtered Data as Excel",
-                    data=f.read(),
-                    file_name='filtered_permissions.xlsx',
-                    mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                )
+            # Download buttons for both filtered and unfiltered data
+            unfiltered_excel_data = convert_df_to_excel(converted_df)
+            filtered_excel_data = convert_df_to_excel(filtered_df)
+            
+            st.download_button(
+                label="Download Unfiltered Data as Excel",
+                data=open(unfiltered_excel_data, 'rb').read(),
+                file_name='unfiltered_permissions.xlsx',
+                mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            st.download_button(
+                label="Download Filtered Data as Excel",
+                data=open(filtered_excel_data, 'rb').read(),
+                file_name='filtered_permissions.xlsx',
+                mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
