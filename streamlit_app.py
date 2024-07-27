@@ -42,7 +42,7 @@ if mode == "Convert to Columns":
             excel_data = convert_df_to_excel(converted_df)
             st.download_button(
                 label="Download Converted Data as Excel",
-                data=open(excel_data, 'rb'),
+                data=open(excel_data, 'rb').read(),
                 file_name='converted_permissions.xlsx',
                 mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
