@@ -20,18 +20,6 @@ def convert_columns_to_permissions(df):
 st.set_page_config(layout="wide")
 st.title("Permission Converter")
 
-# Custom CSS to set table width
-st.markdown(
-    """
-    <style>
-    .dataframe-table {
-        width: 100% !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 mode = st.selectbox("Select Mode", ["Convert to Columns", "Convert Columns to Permissions"])
 
 if mode == "Convert to Columns":
@@ -46,12 +34,12 @@ if mode == "Convert to Columns":
             st.error("The uploaded file does not contain a 'Permissions' column.")
         else:
             st.write("Original Data")
-            st.dataframe(df.style.set_table_attributes('class="dataframe-table"'))
+            st.write(df)
             
             converted_df = convert_to_columns(df)
             
             st.write("Converted Data")
-            st.dataframe(converted_df.style.set_table_attributes('class="dataframe-table"'))
+            st.write(converted_df)
             
             @st.cache
             def convert_df_to_excel(df):
@@ -81,12 +69,12 @@ elif mode == "Convert Columns to Permissions":
             st.error("The uploaded file does not contain a 'Tags' column.")
         else:
             st.write("Original Data")
-            st.dataframe(df.style.set_table_attributes('class="dataframe-table"'))
+            st.write(df)
             
             converted_df = convert_columns_to_permissions(df)
             
             st.write("Converted Data")
-            st.dataframe(converted_df.style.set_table_attributes('class="dataframe-table"'))
+            st.write(converted_df)
             
             @st.cache
             def convert_df_to_excel(df):
