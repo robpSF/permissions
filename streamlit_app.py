@@ -27,7 +27,7 @@ if mode == "Convert to Columns":
     uploaded_file = st.file_uploader("Upload an Excel file", type=["xlsx"])
     
     if uploaded_file is not None:
-        df = pd.read_excel(uploaded_file)
+        df = pd.read_excel(uploaded_file).fillna('')
         
         if 'Permissions' not in df.columns:
             st.error("The uploaded file does not contain a 'Permissions' column.")
@@ -62,7 +62,7 @@ elif mode == "Convert Columns to Permissions":
     uploaded_file = st.file_uploader("Upload an Excel file", type=["xlsx"])
     
     if uploaded_file is not None:
-        df = pd.read_excel(uploaded_file)
+        df = pd.read_excel(uploaded_file).fillna('')
         
         if 'Tags' not in df.columns:
             st.error("The uploaded file does not contain a 'Tags' column.")
