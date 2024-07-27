@@ -3,17 +3,18 @@ import pandas as pd
 import tempfile
 
 def convert_to_columns(df):
+    # Split the 'Permissions' column into multiple columns
     permissions = df['Permissions'].dropna().str.split(',', expand=True).stack().str.strip().unique()
     for perm in permissions:
         df[perm] = df['Permissions'].apply(lambda x: 'x' if pd.notna(x) and perm in x else '')
-    return df.drop(columns=['Permissions'])
+    return df.drop(columns=['Permissions']).fillna('')
 
 def convert_columns_to_permissions(df):
     tags_index = df.columns.get_loc('Tags') + 1
     permission_cols = df.columns[tags_index:]
     
     df['Permissions'] = df.apply(lambda row: ', '.join([col for col in permission_cols if row[col] == 'x']), axis=1)
-    return df.drop(columns=permission_cols)
+    return df.drop(columns=permission_cols).fillna('')
 
 # Streamlit App
 st.title("Permission Converter")
