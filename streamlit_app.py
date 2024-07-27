@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import tempfile
 
 def convert_to_columns(df):
     # Split the 'Permissions' column into multiple columns
@@ -34,15 +35,16 @@ if mode == "Convert to Columns":
             
             @st.cache
             def convert_df_to_excel(df):
-                output = pd.ExcelWriter("/mnt/data/converted_permissions.xlsx", engine='xlsxwriter')
-                df.to_excel(output, index=False)
-                output.save()
-                return output.path
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
+                    with pd.ExcelWriter(tmp.name, engine='xlsxwriter') as writer:
+                        df.to_excel(writer, index=False)
+                    return tmp.name
             
             excel_data = convert_df_to_excel(converted_df)
-            st.download_button(
-                label="Download Converted Data as Excel",
-                data=open(excel_data, 'rb').read(),
-                file_name='converted_permissions.xlsx',
-                mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            )
+            with open(excel_data, 'rb') as f:
+                st.download_button(
+                    label="Download Converted Data as Excel",
+                    data=f.read(),
+                    file_name='converted_permissions.xlsx',
+                    mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                )
