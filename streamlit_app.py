@@ -3,9 +3,9 @@ import pandas as pd
 
 def convert_to_columns(df):
     # Split the 'Permissions' column into multiple columns
-    permissions = df['Permissions'].str.split(',', expand=True).stack().str.strip().unique()
+    permissions = df['Permissions'].dropna().str.split(',', expand=True).stack().str.strip().unique()
     for perm in permissions:
-        df[perm] = df['Permissions'].apply(lambda x: 'x' if perm in x else '')
+        df[perm] = df['Permissions'].apply(lambda x: 'x' if pd.notna(x) and perm in x else '')
     return df.drop(columns=['Permissions'])
 
 # Streamlit App
@@ -34,12 +34,15 @@ if mode == "Convert to Columns":
             
             @st.cache
             def convert_df_to_excel(df):
-                return df.to_excel(index=False, engine='xlsxwriter')
+                output = pd.ExcelWriter("/mnt/data/converted_permissions.xlsx", engine='xlsxwriter')
+                df.to_excel(output, index=False)
+                output.save()
+                return output.path
             
             excel_data = convert_df_to_excel(converted_df)
             st.download_button(
                 label="Download Converted Data as Excel",
-                data=excel_data,
+                data=open(excel_data, 'rb'),
                 file_name='converted_permissions.xlsx',
                 mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
