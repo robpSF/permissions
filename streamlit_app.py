@@ -2,11 +2,11 @@ import streamlit as st
 import pandas as pd
 
 def convert_to_columns(df):
-    # Split the 'Permission' column into multiple columns
-    permissions = df['Permission'].str.split(',', expand=True).stack().str.strip().unique()
+    # Split the 'Permissions' column into multiple columns
+    permissions = df['Permissions'].str.split(',', expand=True).stack().str.strip().unique()
     for perm in permissions:
-        df[perm] = df['Permission'].apply(lambda x: 'x' if perm in x else '')
-    return df.drop(columns=['Permission'])
+        df[perm] = df['Permissions'].apply(lambda x: 'x' if perm in x else '')
+    return df.drop(columns=['Permissions'])
 
 # Streamlit App
 st.title("Permission Converter")
@@ -21,8 +21,8 @@ if mode == "Convert to Columns":
     if uploaded_file is not None:
         df = pd.read_excel(uploaded_file)
         
-        if 'Permission' not in df.columns:
-            st.error("The uploaded file does not contain a 'Permission' column.")
+        if 'Permissions' not in df.columns:
+            st.error("The uploaded file does not contain a 'Permissions' column.")
         else:
             st.write("Original Data")
             st.dataframe(df)
