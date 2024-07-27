@@ -17,6 +17,7 @@ def convert_columns_to_permissions(df):
     return df.drop(columns=permission_cols).fillna('')
 
 # Streamlit App
+st.set_page_config(layout="wide")
 st.title("Permission Converter")
 
 mode = st.selectbox("Select Mode", ["Convert to Columns", "Convert Columns to Permissions"])
@@ -33,12 +34,12 @@ if mode == "Convert to Columns":
             st.error("The uploaded file does not contain a 'Permissions' column.")
         else:
             st.write("Original Data")
-            st.dataframe(df)
+            st.dataframe(df, width=1500)
             
             converted_df = convert_to_columns(df)
             
             st.write("Converted Data")
-            st.dataframe(converted_df)
+            st.dataframe(converted_df, width=1500)
             
             @st.cache
             def convert_df_to_excel(df):
@@ -68,12 +69,12 @@ elif mode == "Convert Columns to Permissions":
             st.error("The uploaded file does not contain a 'Tags' column.")
         else:
             st.write("Original Data")
-            st.dataframe(df)
+            st.dataframe(df, width=1500)
             
             converted_df = convert_columns_to_permissions(df)
             
             st.write("Converted Data")
-            st.dataframe(converted_df)
+            st.dataframe(converted_df, width=1500)
             
             @st.cache
             def convert_df_to_excel(df):
