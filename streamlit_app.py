@@ -73,7 +73,7 @@ elif mode == "Convert Columns to Permissions":
             converted_df = convert_columns_to_permissions(df)
             
             st.write("Converted Data")
-            st.dataframe(converted_df)
+            st.write(converted_df)
             
             @st.cache
             def convert_df_to_excel(df):
