@@ -27,10 +27,14 @@ if uploaded_file:
     required_columns = ["Name", "Handle", "Faction", "Tags"]
     permissions_columns = [col for col in df.columns if col not in required_columns]
     
-    st.write("Permissions Table")
-    df_permissions = df[required_columns + permissions_columns]
+    # Add a dropdown to filter by Faction
+    faction_filter = st.selectbox("Select Faction", options=df["Faction"].unique())
+    df_filtered = df[df["Faction"] == faction_filter]
+    
+    st.write(f"Filtered Data by Faction: {faction_filter}")
     
     # Displaying the table with checkmarks for permissions
+    df_permissions = df_filtered[required_columns + permissions_columns]
     for perm in permissions_columns:
         df_permissions[perm] = df_permissions[perm].apply(lambda x: "✅" if x == 'yes' else "")
     
@@ -46,7 +50,7 @@ if uploaded_file:
     # Update permission assignments
     for perm in permissions_columns:
         st.write(f"Manage Permission: {perm}")
-        for i, row in df.iterrows():
+        for i, row in df_filtered.iterrows():
             checked = st.checkbox(f"{row['Name']} ({row['Handle']})", value=(row[perm] == 'yes'), key=f"{perm}_{i}")
             df.at[i, perm] = 'yes' if checked else ''
     
