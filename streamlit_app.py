@@ -45,14 +45,17 @@ if uploaded_file:
     if st.button("Add Permission"):
         df = update_permissions(df, new_permission)
         permissions_columns.append(new_permission)
+        df_filtered = update_permissions(df_filtered, new_permission)  # Ensure new column is in filtered DataFrame
         st.success(f"Permission '{new_permission}' added.")
     
     # Update permission assignments
     for perm in permissions_columns:
         st.write(f"Manage Permission: {perm}")
+        if perm not in df_filtered.columns:
+            df_filtered[perm] = ''
         for i, row in df_filtered.iterrows():
             checked = st.checkbox(f"{row['Name']} ({row['Handle']})", value=(row[perm] == 'yes'), key=f"{perm}_{i}")
-            df.at[i, perm] = 'yes' if checked else ''
+            df.at[row.name, perm] = 'yes' if checked else ''
     
     # Save updated DataFrame back to Excel
     if st.button("Save Updates"):
