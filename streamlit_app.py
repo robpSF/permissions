@@ -44,6 +44,8 @@ if mode == "Convert to Columns":
             st.write(df)
             
             converted_df = convert_to_columns(df)
+            converted_df = converted_df[['Name', 'Handle', 'Permissions', 'Faction', 'Beliefs', 'Tags']]
+
             
             st.write("Converted Data")
             st.write(converted_df)
@@ -56,6 +58,7 @@ if mode == "Convert to Columns":
                     return tmp.name
             
             excel_data = convert_df_to_excel(converted_df)
+
             with open(excel_data, 'rb') as f:
                 st.download_button(
                     label="Download Converted Data as Excel",
@@ -79,6 +82,8 @@ elif mode == "Convert Columns to Permissions":
             st.write(df)
             
             converted_df = convert_columns_to_permissions(df)
+            converted_df = converted_df[['Name', 'Handle', 'Permissions', 'Faction', 'Beliefs', 'Tags']]
+
             
             st.write("Converted Data")
             st.write(converted_df)
